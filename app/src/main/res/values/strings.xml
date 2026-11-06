@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">来电速查</string>
+
+    <string name="main_toggle_label">开启监听</string>
+    <string name="main_toggle_description">以前台服务常驻，来电、去电时读取本机统计</string>
+    <string name="main_status_running">监听中</string>
+    <string name="main_status_off">监听未开启</string>
+    <string name="main_status_stopped_hint">监听已停止，请重新开启</string>
+    <string name="main_status_permissions_missing">权限不完整，无法开启监听</string>
+    <string name="main_battery_warning">建议将省电策略设为“无限制”，否则后台可能收不到来电事件</string>
+    <string name="snackbar_permissions_missing">请先授予通话记录、电话状态、悬浮窗和通知权限</string>
+
+    <string name="permission_section_title">权限</string>
+    <string name="permission_call_log">通话记录</string>
+    <string name="permission_call_log_description">读取该号码的历史来电与去电统计</string>
+    <string name="permission_phone_state">电话状态</string>
+    <string name="permission_phone_state_description">识别来电、去电与通话状态，并获取号码</string>
+    <string name="permission_overlay">悬浮窗</string>
+    <string name="permission_overlay_description">在来电、去电和通话中展示统计浮层</string>
+    <string name="permission_notifications">通知</string>
+    <string name="permission_notifications_description">展示监听前台服务的常驻通知</string>
+    <string name="permission_battery">省电策略</string>
+    <string name="permission_battery_description">HyperOS 需设为“无限制”，否则后台可能收不到来电事件</string>
+    <string name="permission_autostart">自启动</string>
+    <string name="permission_autostart_description">允许开机后恢复监听（可选，需在系统设置中手动开启）</string>
+    <string name="permission_status_granted">已授予</string>
+    <string name="permission_status_battery_ignored">无限制</string>
+    <string name="permission_action_grant">去授权</string>
+    <string name="permission_action_settings">去设置</string>
+    <string name="permission_action_configure">去配置</string>
+
+    <string name="settings_title">统计设置</string>
+    <string name="settings_repeat_window">重复来电窗口</string>
+    <string name="settings_repeat_window_value">%1$d 分钟</string>
+    <string name="settings_stats_period">统计周期</string>
+    <string name="settings_stats_period_value">%1$d 个月</string>
+    <string name="settings_normalize">号码归一化匹配</string>
+    <string name="settings_normalize_description">去除空格、横线与国家码后再匹配</string>
+    <string name="settings_outgoing_overlay">去电时展示浮层</string>
+    <string name="settings_outgoing_overlay_description">拨出电话时同样展示该号码的统计</string>
+    <string name="setting_decrease_symbol">−</string>
+    <string name="setting_increase_symbol">+</string>
+
+    <string name="about_title">关于</string>
+    <string name="about_back">返回</string>
+    <string name="about_content">本应用仅读取本机通话记录（CallLog.Calls），不联网、不上传、不保存号码。用于在来电、去电和通话过程中展示该号码在本机的历史通话统计。</string>
+    <string name="about_permissions_title">权限用途</string>
+    <string name="about_permissions_content">通话记录：读取历史来电与去电统计。\n电话状态：识别来电、去电与通话状态。\n悬浮窗：展示统计浮层。\n通知：展示监听前台服务通知。\n应用未声明 INTERNET 权限。</string>
+    <string name="about_setup_title">HyperOS 设置</string>
+    <string name="about_setup_content">1. 自启动：允许“来电速查”自启动，否则重启后不会恢复监听。\n2. 省电策略：在“电量详情”中设为“无限制”，否则后台可能收不到来电事件。\n3. 悬浮窗：允许显示在其他应用的上层。\n4. 通知：允许发送通知。</string>
+    <string name="about_version">版本 %1$s</string>
+
+    <string name="notification_channel_name">通话监听</string>
+    <string name="notification_channel_description">保持通话监听在后台运行</string>
+    <string name="notification_title">来电速查正在监听</string>
+    <string name="notification_text">来电时将展示本机通话统计</string>
+    <string name="notification_action_stop">停止监听</string>
+
+    <string name="stats_preview_entry">统计预览（调试）</string>
+    <string name="stats_preview_title">统计预览</string>
+    <string name="stats_preview_description">输入号码后读取本机通话记录并计算统计。仅用于调试。</string>
+    <string name="stats_preview_number">号码</string>
+    <string name="stats_preview_calculate">计算统计</string>
+    <string name="stats_preview_loading">读取中…</string>
+    <string name="stats_preview_invalid_number">无法匹配该号码（隐藏号码或没有有效数字）</string>
+    <string name="stats_preview_failed">读取失败：%1$s</string>
+    <string name="stats_preview_yes">是</string>
+    <string name="stats_preview_no">否</string>
+    <string name="stats_preview_first_incoming">首次来电</string>
+    <string name="stats_preview_first_contact">首次联系</string>
+    <string name="stats_preview_period">统计周期</string>
+    <string name="stats_preview_period_value">%1$d 个月</string>
+    <string name="stats_preview_incoming">窗口内来电</string>
+    <string name="stats_preview_incoming_value">%1$d 次（已接 %2$d，未接 %3$d）</string>
+    <string name="stats_preview_outgoing">窗口内去电</string>
+    <string name="stats_preview_outgoing_value">%1$d 次（接通 %2$d）</string>
+    <string name="stats_preview_durations">累计通话时长</string>
+    <string name="stats_preview_durations_value">来电 %1$d 秒 / 去电 %2$d 秒</string>
+    <string name="stats_preview_last_incoming">最近接听</string>
+    <string name="stats_preview_last_outgoing">最近去电</string>
+    <string name="stats_preview_last_value">%1$s · %2$d 秒</string>
+    <string name="stats_preview_outside_period">（统计周期外）</string>
+    <string name="stats_preview_repeat">重复来电</string>
+    <string name="stats_preview_repeat_value">窗口内第 %1$d 次</string>
+    <string name="stats_preview_repeat_with_missed">，含未接来电</string>
+    <string name="stats_preview_all_time">全量记录</string>
+    <string name="stats_preview_all_time_value">来电 %1$d 次 / 去电 %2$d 次</string>
+    <string name="stats_preview_none">无记录</string>
+    <string name="stats_preview_header_first_incoming">首次来电</string>
+    <string name="stats_preview_header_quiet">近期无记录 · 历史 %1$d 次</string>
+    <string name="stats_preview_header_nth">第 %1$d 次来电</string>
+
+    <string name="overlay_loading">统计中…</string>
+    <string name="overlay_direction_incoming">来电</string>
+    <string name="overlay_direction_outgoing">去电</string>
+    <string name="overlay_first_incoming">首次来电</string>
+    <string name="overlay_quiet_incoming">近期无记录 · 历史 %1$d 次</string>
+    <string name="overlay_nth_incoming">第 %1$d 次来电</string>
+    <string name="overlay_first_contact">首次联系</string>
+    <string name="overlay_quiet_outgoing">近期无去电 · 历史 %1$d 次</string>
+    <string name="overlay_nth_contact">第 %1$d 次联系</string>
+    <string name="overlay_summary_incoming">近 %1$d 个月来电 %2$d 次，接听 %3$d 次</string>
+    <string name="overlay_summary_outgoing">近 %1$d 个月去电 %2$d 次，接通 %3$d 次</string>
+    <string name="overlay_incoming_counts">来电 %1$d · 已接 %2$d · 未接 %3$d</string>
+    <string name="overlay_outgoing_counts">去电 %1$d · 接通 %2$d</string>
+    <string name="overlay_durations">通话时长 来电 %1$s · 去电 %2$s</string>
+    <string name="overlay_last_incoming_label">上次接听</string>
+    <string name="overlay_last_outgoing_label">上次去电</string>
+    <string name="overlay_last_value">%1$s · %2$s</string>
+    <string name="overlay_none">无</string>
+    <string name="overlay_outside_period">（周期外）</string>
+    <string name="overlay_duration_seconds">%1$d 秒</string>
+    <string name="overlay_duration_minutes">%1$d 分 %2$d 秒</string>
+    <string name="overlay_collapsed_incoming">来电 %1$d · 未接 %2$d</string>
+    <string name="overlay_collapsed_outgoing">去电 %1$d · 接通 %2$d</string>
+
+    <string name="simulation_entry">模拟通话（调试）</string>
+    <string name="simulation_title">模拟通话</string>
+    <string name="simulation_description">注入通话状态以验证统计与浮层。需先在首页开启监听并授予悬浮窗权限。</string>
+    <string name="simulation_number">号码</string>
+    <string name="simulation_incoming">模拟来电</string>
+    <string name="simulation_outgoing">模拟去电</string>
+    <string name="simulation_requires_monitor">请先在首页开启监听</string>
+    <string name="simulation_running">模拟进行中…</string>
+    <string name="simulation_finished">模拟结束</string>
+</resources>
