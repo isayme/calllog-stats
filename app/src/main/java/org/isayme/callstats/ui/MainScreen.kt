@@ -228,6 +228,15 @@ fun MainScreen(
                     }
                     HorizontalDivider()
                     PermissionRow(
+                        title = stringResource(R.string.permission_accessibility),
+                        description = stringResource(R.string.permission_accessibility_description),
+                        granted = permissions.accessibilityService,
+                        grantedLabel = stringResource(R.string.permission_status_granted),
+                        actionLabel = stringResource(R.string.permission_action_enable),
+                        onAction = { PermissionActions.openAccessibilitySettings(context) },
+                    )
+                    HorizontalDivider()
+                    PermissionRow(
                         title = stringResource(R.string.permission_battery),
                         description = stringResource(R.string.permission_battery_description),
                         granted = permissions.batteryOptimizationIgnored,

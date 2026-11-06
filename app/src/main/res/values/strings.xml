@@ -26,6 +26,11 @@
     <string name="permission_autostart_description">允许开机后恢复监听（可选，需在系统设置中手动开启）</string>
     <string name="permission_status_granted">已授予</string>
     <string name="permission_status_battery_ignored">无限制</string>
+    <string name="permission_accessibility">锁屏显示（无障碍）</string>
+    <string name="permission_accessibility_description">开启无障碍服务后，锁屏来电时也能显示统计</string>
+    <string name="permission_action_enable">去开启</string>
+    <string name="accessibility_service_label">来电速查锁屏显示</string>
+    <string name="accessibility_service_description">锁屏来电时显示本机通话统计。仅在通话期间使用，不读取或分析屏幕内容。</string>
     <string name="permission_action_grant">去授权</string>
     <string name="permission_action_settings">去设置</string>
     <string name="permission_action_configure">去配置</string>
@@ -48,7 +53,7 @@
     <string name="about_permissions_title">权限用途</string>
     <string name="about_permissions_content">通话记录：读取历史来电与去电统计。\n电话状态：识别来电、去电与通话状态。\n悬浮窗：展示统计浮层。\n通知：展示监听前台服务通知。\n应用未声明 INTERNET 权限。</string>
     <string name="about_setup_title">HyperOS 设置</string>
-    <string name="about_setup_content">1. 自启动：允许“来电速查”自启动，否则重启后不会恢复监听。\n2. 省电策略：在“电量详情”中设为“无限制”，否则后台可能收不到来电事件。\n3. 悬浮窗：允许显示在其他应用的上层。\n4. 通知：允许发送通知。</string>
+    <string name="about_setup_content">1. 自启动：允许“来电速查”自启动，否则重启后不会恢复监听。\n2. 省电策略：在“电量详情”中设为“无限制”，否则后台可能收不到来电事件。\n3. 悬浮窗：允许显示在其他应用的上层。\n4. 通知：允许发送通知。\n5. 锁屏显示：在系统“无障碍”设置中开启“来电速查锁屏显示”。该服务只用于锁屏来电时展示统计，不读取屏幕内容。</string>
     <string name="about_version">版本 %1$s</string>
 
     <string name="notification_channel_name">通话监听</string>

@@ -1,5 +1,6 @@
 package org.isayme.callstats.overlay
 
+import android.app.KeyguardManager
 import android.content.Context
 import android.graphics.PixelFormat
 import android.provider.Settings
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.isayme.callstats.R
+import org.isayme.callstats.accessibility.AccessibilityOverlayBridge
 import org.isayme.callstats.call.CallDirection
 import org.isayme.callstats.data.OverlayPosition
 import org.isayme.callstats.data.SettingsRepository
@@ -41,11 +43,14 @@ class CallOverlayController(
 ) {
     private val mainScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val windowManager = context.getSystemService(WindowManager::class.java)
+    private val keyguardManager = context.getSystemService(KeyguardManager::class.java)
     private val state = MutableStateFlow<OverlayState?>(null)
 
     private var composeView: ComposeView? = null
     private var viewOwner: OverlayViewOwner? = null
     private var layoutParams: WindowManager.LayoutParams? = null
+    private var activeWindowManager: WindowManager = windowManager
+    private var activeWindowType = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
 
     private var expanded = true
     private var userExpanded = false
@@ -59,7 +64,33 @@ class CallOverlayController(
                 Log.w(TAG, "overlay permission missing, skipping window")
                 return@launch
             }
-            ensureView()
+            val accessibilityService = AccessibilityOverlayBridge.service
+            val lockScreen = keyguardManager.isKeyguardLocked
+            val useAccessibilityOverlay = lockScreen && accessibilityService != null
+            if (lockScreen && accessibilityService == null) {
+                Log.w(TAG, "lock screen detected but accessibility overlay is not enabled")
+            }
+            val viewContext: Context = if (useAccessibilityOverlay) {
+                accessibilityService!!
+            } else {
+                context
+            }
+            val viewWindowManager = if (useAccessibilityOverlay) {
+                accessibilityService!!.getSystemService(WindowManager::class.java)
+            } else {
+                windowManager
+            }
+            val windowType = if (useAccessibilityOverlay) {
+                WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY
+            } else {
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+            }
+            Log.i(
+                TAG,
+                "show number=$number keyguardLocked=$lockScreen " +
+                    "accessibility=$useAccessibilityOverlay",
+            )
+            ensureView(viewContext, viewWindowManager, windowType)
             expanded = true
             userExpanded = false
             cancelAutoCollapse()
@@ -105,12 +136,20 @@ class CallOverlayController(
         }
     }
 
-    private fun ensureView() {
-        if (composeView != null) {
+    private fun ensureView(
+        viewContext: Context,
+        targetWindowManager: WindowManager,
+        windowType: Int,
+    ) {
+        if (composeView != null &&
+            activeWindowManager === targetWindowManager &&
+            activeWindowType == windowType
+        ) {
             return
         }
+        removeCurrentView()
         val owner = OverlayViewOwner()
-        val themedContext = ContextThemeWrapper(context, R.style.Theme_CallStats)
+        val themedContext = ContextThemeWrapper(viewContext, R.style.Theme_CallStats)
         val view = ComposeView(themedContext).apply {
             setViewTreeLifecycleOwner(owner)
             setViewTreeViewModelStoreOwner(owner)
@@ -129,9 +168,9 @@ class CallOverlayController(
                 }
             }
         }
-        val params = createLayoutParams()
+        val params = createLayoutParams(windowType)
         try {
-            windowManager.addView(view, params)
+            targetWindowManager.addView(view, params)
             owner.resume()
         } catch (error: Exception) {
             Log.e(TAG, "unable to add overlay window", error)
@@ -141,16 +180,29 @@ class CallOverlayController(
         composeView = view
         viewOwner = owner
         layoutParams = params
+        activeWindowManager = targetWindowManager
+        activeWindowType = windowType
     }
 
-    private fun createLayoutParams(): WindowManager.LayoutParams {
+    @Suppress("DEPRECATION")
+    private fun createLayoutParams(windowType: Int): WindowManager.LayoutParams {
         val density = context.resources.displayMetrics.density
+        val flags = if (windowType == WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY) {
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+        } else {
+            WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+        }
         return WindowManager.LayoutParams(
             (CARD_WIDTH_DP * density).toInt(),
             WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+            windowType,
+            flags,
             PixelFormat.TRANSLUCENT,
         ).apply {
             gravity = Gravity.TOP or Gravity.END
@@ -169,7 +221,7 @@ class CallOverlayController(
         params.x = position.x
         params.y = position.y
         composeView?.let { view ->
-            runCatching { windowManager.updateViewLayout(view, params) }
+            runCatching { activeWindowManager.updateViewLayout(view, params) }
                 .onFailure { Log.w(TAG, "failed to apply saved overlay position", it) }
         }
     }
@@ -186,7 +238,7 @@ class CallOverlayController(
         val maxY = (metrics.heightPixels - view.height).coerceAtLeast(0)
         params.x = (params.x - deltaX.toInt()).coerceIn(0, maxX)
         params.y = (params.y + deltaY.toInt()).coerceIn(0, maxY)
-        runCatching { windowManager.updateViewLayout(view, params) }
+        runCatching { activeWindowManager.updateViewLayout(view, params) }
             .onFailure { Log.w(TAG, "failed to move overlay", it) }
     }
 
@@ -224,16 +276,22 @@ class CallOverlayController(
     }
 
     private fun removeView() {
+        removeCurrentView()
+        state.value = null
+    }
+
+    private fun removeCurrentView() {
         cancelAutoCollapse()
         composeView?.let { view ->
-            runCatching { windowManager.removeView(view) }
+            runCatching { activeWindowManager.removeView(view) }
                 .onFailure { Log.w(TAG, "failed to remove overlay", it) }
         }
         viewOwner?.destroy()
         composeView = null
         viewOwner = null
         layoutParams = null
-        state.value = null
+        activeWindowManager = windowManager
+        activeWindowType = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
     }
 
     private companion object {

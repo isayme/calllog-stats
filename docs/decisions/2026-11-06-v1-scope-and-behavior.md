@@ -151,6 +151,23 @@
 - 已知限制：锁屏来电时浮层被系统 keyguard 遮挡，用户需解锁后查看。
 - Android 10 兼容性：尝试在 Redmi Note 7 Pro 上侧载，被 MIUI 的安装确认弹窗拦截（`INSTALL_FAILED_USER_RESTRICTED`），未完成；目标机 K80（Android 16）已完成全部验证。minSdk 26 的更低版本未实机覆盖。
 
+## 锁屏显示方案修订（2026-11-06）
+
+M3b/M4 验证确认：HyperOS 不允许普通第三方应用在锁屏来电界面之上显示内容。以下路径均实测失败：
+
+- `TYPE_APPLICATION_OVERLAY` + `FLAG_SHOW_WHEN_LOCKED`（普通窗口、全屏窗口、`WRAP_CONTENT` + `LAYOUT_IN_SCREEN` + `SHORT_EDGES`）：窗口创建成功，但被 keyguard 遮挡；系统实际生效的 flags 中不包含 `FLAG_SHOW_WHEN_LOCKED`。
+- `showWhenLocked` Activity：MIUI 返回 `Permission Denied Activity KeyguardLocked` 与 `Abort background activity starts`（result code 102）。
+- Full-screen intent 通知：授予 `USE_FULL_SCREEN_INTENT` 后 `canUseFullScreenIntent=true`、通知发布成功，但锁屏通话期间系统不拉起目标 Activity，通知栏也不显示该通知。
+
+**新决策：使用无障碍服务承载锁屏浮层。**
+
+- 新增 `CallStatsAccessibilityService`，仅用于持有 `TYPE_ACCESSIBILITY_OVERLAY` 窗口；`canRetrieveWindowContent=false`，不处理无障碍事件。
+- 锁屏时由该窗口显示统计卡片，普通浮层窗口不创建；解锁时仍使用原 `TYPE_APPLICATION_OVERLAY` 窗口。
+- 卡片可拖动、点击折叠；卡片范围之外的触摸穿透到系统通话界面（实测可触发系统快捷回复）。
+- 无障碍服务未开启时，锁屏仍不显示，自动回退到普通浮层；首页新增“锁屏显示（无障碍）”入口，About 页与 README 说明开启方式。
+- 权衡：无障碍权限较重，部分应用市场审核可能质疑用途；因此必须明确说明服务只用于锁屏浮层、不读取屏幕内容。若不接受该权衡，则只能接受锁屏不显示。
+- 验证：K80 锁屏来电时卡片显示在系统来电界面之上，接听/拒绝按钮未被遮挡；通话结束窗口移除。
+
 ## 未决风险
 
 - `READ_CALL_LOG` 在部分安装器/ROM 上可能无法授予，M0 探针是硬性关卡。

@@ -15,6 +15,10 @@ object PermissionActions {
         )
     }
 
+    fun openAccessibilitySettings(context: Context) {
+        startOrIgnore(context, Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+    }
+
     fun requestIgnoreBatteryOptimizations(context: Context) {
         val request = Intent(
             Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,

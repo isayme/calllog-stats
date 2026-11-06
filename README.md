@@ -34,6 +34,10 @@ HyperOS requires manual configuration for reliable background call detection:
    while the foreground service is running.
 3. **Overlay**: allow display over other apps.
 4. **Notifications**: allow notifications so the monitoring notification is visible.
+5. **Lock screen display**: enable **来电速查锁屏显示** in system accessibility settings.
+   This accessibility service only owns the lock-screen statistics window. It does not
+   read window content or inspect accessibility events. Without it, the statistics are
+   only visible after unlocking the device.
 
 ## Documentation
 
